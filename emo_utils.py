@@ -41,6 +41,8 @@ def get_paths (p_root_dir = ''):
 
     assert Path(paths['data_dir']).exists(), 'Не найдена директория с данными "{}"'.format(paths['data_dir'])
     paths['train_data_dir'] = paths['data_dir'] + '/train'
+    paths['train_aug_data_dir'] = paths['data_dir'] + '/train_aug'
+    paths['val_data_dir'] = paths['data_dir'] + '/val'
     paths['test_data_dir'] = paths['data_dir'] + '/test_kaggle'
     paths['class_names_path'] = paths['data_dir'] + '/class_names.txt'
 
