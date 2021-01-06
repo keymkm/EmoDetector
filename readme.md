@@ -73,5 +73,5 @@
 ![alt text](images/google_param.png)
 ![alt text](images/train_params.png)
 
-4. Для теста классификатора эмоций используйте ноутбук **emo_classificator_test.ipynb **,  в качестве параметра задайте путь к сохраненной модели из папки models. Скачайте сохраненные модели: https://drive.google.com/uc?id=1EdXlwE0EBXLMi18fwFKxCX3MuR1sNvay и распакуйте в папку **model**
+4. Для теста классификатора эмоций используйте ноутбук **emo_classificator_test.ipynb **,  в качестве параметра задайте путь к сохраненной модели из папки models. Скачайте сохраненные модели: https://drive.google.com/drive/folders/1EdXlwE0EBXLMi18fwFKxCX3MuR1sNvay?usp=sharing и распакуйте в папку **model**
 5. Не обязательно. Для ускорения обучения можно предварительно сгенерироровать аугментированный набор данных. Для этого выполните код из ноутбука **emo_classificator_prep_data.ipynb**
