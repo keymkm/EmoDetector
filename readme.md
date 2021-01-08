@@ -14,12 +14,12 @@
 * Xception
 <br>
 
-От базовых моделей отрезались финальные (конечные) слои, которые используются для предсказания они заменялись на слой для предсказания класса эмоций, все слои, кроме последних блоков со сверточными слоями, «замораживались» для обучения.<br>
+От базовых моделей отрезались финальные (конечные) слои, которые используются для предсказания, они заменялись на слой для предсказания класса эмоций, все слои, кроме последних блоков со сверточными слоями, «замораживались» для обучения.<br>
 Были проведены следующие эксперименты:<br>
 
 
 | **№ Эксперимента** | **Дата** | **Базовая модель** | **Дополнительные слои**                                                                                                                                                                                                                        | **Оптимизатор**                                            | **Loss**                    | **Аугментация** | **Количество эпох** | **Точность на валидации** |
-| ------------------ | -------- | ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------- | --------------------------- | ---------------: | -------------------: | -------------------------: |
+| ------------------ | -------- | ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------- | --------------------------- | --------------: | ------------------: | ------------------------: |
 | 1                  | 19.12.20 | resnet50           | tf.keras.layers.Flatten(),<br>tf.keras.layers.Dense(1024, activation='relu'), tf.keras.layers.Dense(p\_num\_classes, activation='softmax')                                                                                                     | tf.keras.optimizers.SGD(learning\_rate=0.01, momentum=0.9) | 'categorical\_crossentropy' | нет             | 10                  | 34                        |
 | 2                  | 22.12.20 | vgg16              | tf.keras.layers.Flatten(),<br>tf.keras.layers.Dense(512, activation='relu'),<br>tf.keras.layers.Dense(p\_num\_classes, activation='softmax')\]                                                                                                 | tf.keras.optimizers.SGD(learning\_rate=0.01, momentum=0.9) | 'categorical\_crossentropy' | нет             | 10                  | 14                        |
 | 4                  | 23.12.20 | Xception           | tf.keras.layers.Flatten(),<br>tf.keras.layers.Dense(1024, activation='relu'), tf.keras.layers.Dense(p\_num\_classes, activation='softmax')                                                                                                     | tf.keras.optimizers.SGD(learning\_rate=0.01, momentum=0.9) | 'categorical\_crossentropy' | нет             | 10                  | 34                        |
@@ -31,12 +31,14 @@
 | 10                 | 03.01.21 | resnet50           | f.keras.layers.GlobalAveragePooling2D(),<br>tf.keras.layers.Dropout(0.2),<br>tf.keras.layers.Dense(1024, activation='relu'),<br>tf.keras.layers.Dense(p\_num\_classes, activation='softmax')                                                   | tf.keras.optimizers.SGD(learning\_rate=0.01, momentum=0.9) | 'categorical\_crossentropy' | да              | 20                  | 33                        |
 | 11                 | 04.01.21 | resnet50           | f.keras.layers.GlobalAveragePooling2D(),<br>tf.keras.layers.Dropout(0.2),<br>tf.keras.layers.Dense(1024, activation='relu'),<br>tf.keras.layers.Dense(p\_num\_classes, activation='softmax')                                                   | tf.keras.optimizers.SGD(learning\_rate=0.01, momentum=0.9) | 'categorical\_crossentropy' | да              | 40                  | 34                        |
 | 12                 | 05.01.21 | resnet50           | Разморожены слои из блока «conv5» базовой модели<br>tf.keras.layers.GlobalAveragePooling2D(),<br>tf.keras.layers.Dense(p\_num\_classes, activation='softmax')                                                                                  | tf.keras.optimizers.SGD(learning\_rate=0.01, momentum=0.9) | 'categorical\_crossentropy' | да              | 20                  | 44                        |
+| 13                 | 06.01.21 | Xception           | Разморожены слои из блока «block14» базовой модели<br>tf.keras.layers.GlobalAveragePooling2D(),<br>tf.keras.layers.Dense(p\_num\_classes, activation='softmax')                                                                                | tf.keras.optimizers.SGD(learning\_rate=0.01, momentum=0.9) | 'categorical\_crossentropy' | да              | 20                  | 44                        |
 
 
-Лучший результат: 44% точности на валидации показал классификатор на базе **ResNet50**. Для модели применялся оптимизатор *optimizer= tf.keras.optimizers.SGD(learning_rate=LEARNING_RATE, momentum=0.9)*.<br>
-Модель обучалась 20 эпох, лучшее значение было получено на 16 эпохе, после чего началось переобучение модели. 
 
-![alt text](model/emo_classificator_best_210105121553_resnet50_e20_aug1_acc44.png)
+
+Лучший результат: **44%** точности на валидации показали классификаторы на базе **ResNet50** и **Xception**.<br> 
+Для модели классификатора применялся оптимизатор *optimizer= tf.keras.optimizers.SGD(learning_rate=LEARNING_RATE, momentum=0.9)*.<br>
+Модель обучалась 20 эпох.<br>
 
 При обучении к данным применялась аугментация «на лету» со следующими параметрами:
 
@@ -47,15 +49,30 @@
 * rotation_range=15
 <br><br>
 
+![alt text](model/emo_classificator_best_210105121553_resnet50_e20_aug1_acc44.png)
+
+*Кривая обучения классификатора на базе ResNet50 (лучшее значение получено на 16-й эпохе)*
+
+![alt text](model/emo_classificator_best_210106100147_xception_e20_aug1_acc44.png)
+
+*Кривая обучения классификатора на базе Xception (лучшее значение получено на 12-й эпохе)*
+
+### Заключение
+
+Результаты у классифкаторов на базе **ResNet50** и **Xception** практически одинаковые, поэтому нет разницы, какой из них использовать. Классификатор на базе **VGG16** обучить не удалось, максимальная точность составила всего **14%**, классификатор практически не обучался. Возможно для работы с моделью на базе архитектуры VGG16 нужен другой подход.
+
+
 ### Структура проекта
 
       data/                               исходные и тестовые данные, словари
       model/                              сохраненные модели по результатом каждого эксперимента
       images/                             картинки для описания проекта
+      emo_classificator_model.py          скрипт с классом классификатора эмоций
       emo_classificator_prep_data.ipynb   ноутбук для подготовки аугментированного набора данных для обучения классификатора эмоций
       emo_classificator_test.ipynb        ноутбук для проверки и тестирования классификатора эмоций
       emo_classificator_train.ipynb       ноутбук для создания и обучения классификатора эмоций
-      emo_utils.py                        базовые функции 
+      emo_detector.ipynb                  ноутбук для детекции эмоций по видео с камеры в реальном времени
+      emo_utils.py                        скрипт с базовыми функциями
       experiments.xls                     таблица с описанием проведенных экспериментов 
 
 ### Запуск
@@ -73,5 +90,11 @@
 ![alt text](images/google_param.png)
 ![alt text](images/train_params.png)
 
-4. Для теста классификатора эмоций используйте ноутбук **emo_classificator_test.ipynb **,  в качестве параметра задайте путь к сохраненной модели из папки models. Скачайте сохраненные модели: https://drive.google.com/drive/folders/1EdXlwE0EBXLMi18fwFKxCX3MuR1sNvay?usp=sharing и распакуйте в папку **model**
-5. Не обязательно. Для ускорения обучения можно предварительно сгенерироровать аугментированный набор данных. Для этого выполните код из ноутбука **emo_classificator_prep_data.ipynb**
+4. Не обязательно. Для ускорения обучения можно предварительно сгенерироровать аугментированный набор данных. Для этого выполните код из ноутбука **emo_classificator_prep_data.ipynb**
+
+5. Для теста классификатора эмоций используйте ноутбук **emo_classificator_test.ipynb**,  в качестве параметра задайте путь к сохраненной модели из папки models. Скачайте сохраненные модели: https://drive.google.com/drive/folders/1EdXlwE0EBXLMi18fwFKxCX3MuR1sNvay?usp=sharing и распакуйте в папку **model**
+
+6. Для детекции эмоций по видео с камеры в реальном времени используйте ноутбук **emo_detector.ipynb**, в качестве параметра задайте путь к сохраненной модели из папки models (аналогично п.4).
+
+![alt text](images/emo_detector.png)
+
