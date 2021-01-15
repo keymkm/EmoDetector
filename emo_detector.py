@@ -123,6 +123,6 @@ class EmoDetector:
 #EmoDetector
 
 
-#!!!Тест
-#ed = EmoDetector()
-#ed.run(1)
+if __name__ == '__main__':
+    ed = EmoDetector()
+    ed.run(0)
