@@ -7,19 +7,19 @@
 <br>
 Проект посвящен созданию модели для классификации человеческих эмоций по изображению лица.<br>
 В качестве базового фреймворка используется TensorFlow 2.3.0 и Keras.<br>
-Ввиду ограниченности локальных ресурсов все эксперименты проводились на платформе Google Colab, поэтому было решено строить классификатор на предобученной модели. Были выбраны 3 модели из Top-1 Accuracy Keras Applications:
+Обучение проводилось на платформе Google Colab. Эксперименты проводились с 3-мя моделями из **Top-1 Accuracy Keras Applications**:
   
 * ResNet50
 * VGG16
 * Xception
 <br>
 
-От базовых моделей отрезались финальные (конечные) слои, которые используются для предсказания, они заменялись на слой для предсказания класса эмоций, все слои, кроме последних блоков со сверточными слоями, «замораживались» для обучения.<br>
+От базовых моделей "отрезались" финальные (топовые) слои, которые используются для предсказания, они заменялись на слой для предсказания класса эмоций.<br>
 Были проведены следующие эксперименты:<br>
 
 
 | **№ Эксперимента** | **Дата** | **Базовая модель** | **Дополнительные слои**                                                                                                                                                                                                                        | **Оптимизатор**                                            | **Loss**                    | **Аугментация** | **Количество эпох** | **Точность на валидации** |
-| ------------------ | -------- | ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------- | --------------------------- | --------------: | ------------------: | ------------------------: |
+| ------------------ | -------- | ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------- | --------------------------- | ---------------: | -------------------: | -------------------------: |
 | 1                  | 19.12.20 | resnet50           | tf.keras.layers.Flatten(),<br>tf.keras.layers.Dense(1024, activation='relu'), tf.keras.layers.Dense(p\_num\_classes, activation='softmax')                                                                                                     | tf.keras.optimizers.SGD(learning\_rate=0.01, momentum=0.9) | 'categorical\_crossentropy' | нет             | 10                  | 34                        |
 | 2                  | 22.12.20 | vgg16              | tf.keras.layers.Flatten(),<br>tf.keras.layers.Dense(512, activation='relu'),<br>tf.keras.layers.Dense(p\_num\_classes, activation='softmax')\]                                                                                                 | tf.keras.optimizers.SGD(learning\_rate=0.01, momentum=0.9) | 'categorical\_crossentropy' | нет             | 10                  | 14                        |
 | 4                  | 23.12.20 | Xception           | tf.keras.layers.Flatten(),<br>tf.keras.layers.Dense(1024, activation='relu'), tf.keras.layers.Dense(p\_num\_classes, activation='softmax')                                                                                                     | tf.keras.optimizers.SGD(learning\_rate=0.01, momentum=0.9) | 'categorical\_crossentropy' | нет             | 10                  | 34                        |
@@ -32,12 +32,14 @@
 | 11                 | 04.01.21 | resnet50           | f.keras.layers.GlobalAveragePooling2D(),<br>tf.keras.layers.Dropout(0.2),<br>tf.keras.layers.Dense(1024, activation='relu'),<br>tf.keras.layers.Dense(p\_num\_classes, activation='softmax')                                                   | tf.keras.optimizers.SGD(learning\_rate=0.01, momentum=0.9) | 'categorical\_crossentropy' | да              | 40                  | 34                        |
 | 12                 | 05.01.21 | resnet50           | Разморожены слои из блока «conv5» базовой модели<br>tf.keras.layers.GlobalAveragePooling2D(),<br>tf.keras.layers.Dense(p\_num\_classes, activation='softmax')                                                                                  | tf.keras.optimizers.SGD(learning\_rate=0.01, momentum=0.9) | 'categorical\_crossentropy' | да              | 20                  | 44                        |
 | 13                 | 06.01.21 | Xception           | Разморожены слои из блока «block14» базовой модели<br>tf.keras.layers.GlobalAveragePooling2D(),<br>tf.keras.layers.Dense(p\_num\_classes, activation='softmax')                                                                                | tf.keras.optimizers.SGD(learning\_rate=0.01, momentum=0.9) | 'categorical\_crossentropy' | да              | 20                  | 44                        |
+| 14                 | 19.01.21 | Xception           | Все слои модели Xception обучаемы<br>tf.keras.layers.GlobalAveragePooling2D(),<br>tf.keras.layers.Dense(p\_num\_classes, activation='softmax')                                                                                                 | tf.keras.optimizers.SGD(learning\_rate=0.01, momentum=0.9) | 'categorical\_crossentropy' | да              | 20                  | 52                        |
+| 15                 | 20.01.21 | resnet50           | Все слои модели Resnet обучаемы<br>tf.keras.layers.GlobalAveragePooling2D(),<br>tf.keras.layers.Dense(p\_num\_classes, activation='softmax')                                                                                                   | tf.keras.optimizers.SGD(learning\_rate=0.01, momentum=0.9) | 'categorical\_crossentropy' | да              | 20                  | 53                        |
 
 
 
 
-Лучший результат: **44%** точности на валидации показали классификаторы на базе **ResNet50** и **Xception**.<br> 
-Для модели классификатора применялся оптимизатор *optimizer= tf.keras.optimizers.SGD(learning_rate=LEARNING_RATE, momentum=0.9)*.<br>
+Лучший результат: **53%** точности на валидации показали классификаторы на базе **ResNet50** и **Xception**.<br> 
+Для модели классификатора применялся оптимизатор *optimizer= tf.keras.optimizers.SGD(learning_rate=0.01, momentum=0.9)*.<br>
 Модель обучалась 20 эпох.<br>
 
 При обучении к данным применялась аугментация «на лету» со следующими параметрами:
@@ -49,13 +51,13 @@
 * rotation_range=15
 <br><br>
 
-![alt text](model/emo_classificator_best_210105121553_resnet50_e20_aug1_acc44.png)
+![alt text](model/emo_classificator_best_210120045559_resnet50_e20_aug1_acc53.png)
 
-*Кривая обучения классификатора на базе ResNet50 (лучшее значение получено на 16-й эпохе)*
+*Кривая обучения классификатора на базе ResNet50 (лучшее значение получено на 14-й эпохе)*
 
-![alt text](model/emo_classificator_best_210106100147_xception_e20_aug1_acc44.png)
+![alt text](model/emo_classificator_best_210119123752_xception_e20_aug1_acc52.png)
 
-*Кривая обучения классификатора на базе Xception (лучшее значение получено на 12-й эпохе)*
+*Кривая обучения классификатора на базе Xception (лучшее значение получено на 9-й эпохе)*
 
 ### Заключение
 
